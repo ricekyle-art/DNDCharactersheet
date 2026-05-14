@@ -1759,7 +1759,7 @@
             mage: { name: 'Mage', hitDie: 4, group: 'wizard' },
             illusionist: { name: 'Illusionist', hitDie: 4, group: 'wizard' },
             wujen: { name: 'Wu Jen', hitDie: 4, group: 'wizard' },
-            monk: { name: 'Monk', hitDie: 4, group: 'priest' },
+            monk: { name: 'Monk', hitDie: 4, group: 'warrior' },
             thief: { name: 'Thief', hitDie: 6, group: 'rogue' },
             bard: { name: 'Bard', hitDie: 6, group: 'rogue' }
         };
@@ -2040,6 +2040,7 @@
         raceSelect.addEventListener('change', updateClassOptions);
         class1Select.addEventListener('change', () => updateMultiClassOptions(1));
         class2Select.addEventListener('change', () => updateMultiClassOptions(2));
+        class3Select.addEventListener('change', () => updateMultiClassOptions(3));
         level1Input.addEventListener('input', updateCharacter);
         level2Input.addEventListener('input', updateCharacter);
         level3Input.addEventListener('input', updateCharacter);
@@ -2215,10 +2216,14 @@
             const wisScore = parseInt(abilityInputs.wis.value) || 10;
             const chaScore = parseInt(abilityInputs.cha.value) || 10;
             
-            // INT effects: bonus languages, max spell level, learn spell chance
+            // INT effects: bonus languages, max spell level, learn spell chance (PHB Table 4)
             let intMod = '';
             if (intScore >= 9) {
-                const bonusLang = Math.max(0, intScore - 8);
+                const bonusLang = intScore <= 9 ? 1 : intScore <= 11 ? 2 : intScore <= 13 ? 3 :
+                                  intScore <= 15 ? 4 : intScore === 16 ? 5 : intScore === 17 ? 6 :
+                                  intScore === 18 ? 7 : intScore === 19 ? 8 : intScore === 20 ? 9 :
+                                  intScore === 21 ? 10 : intScore === 22 ? 11 : intScore === 23 ? 12 :
+                                  intScore === 24 ? 15 : 20;
                 intMod = `Bonus Lang: ${bonusLang}`;
             }
             
@@ -2352,10 +2357,10 @@
             const finalHP = classCount > 1 ? Math.floor(totalHP / classCount) : totalHP;
             document.getElementById('hitPoints').textContent = finalHP;
             
-            // If current HP is 0 or greater than max, set to max
+            // Initialize currentHP to max only when the field is truly empty; cap at max
             const currentHPInput = document.getElementById('currentHP');
             const currentHPValue = parseInt(currentHPInput.value) || 0;
-            if (currentHPValue === 0 || currentHPValue > finalHP) {
+            if (currentHPInput.value === '' || currentHPValue > finalHP) {
                 currentHPInput.value = finalHP;
                 currentHP = finalHP;
             }
@@ -2814,7 +2819,12 @@
         
         function addWeaponProficiencySlot() {
             const container = document.getElementById('weaponProficienciesContainer');
-            const currentDiv = container.querySelector('div');
+            let currentDiv = container.querySelector('div');
+            if (!currentDiv) {
+                currentDiv = document.createElement('div');
+                currentDiv.style.cssText = 'display: flex; flex-direction: column; gap: 0.5rem;';
+                container.appendChild(currentDiv);
+            }
             
             // Find the next available slot number
             let nextSlot = 1;
@@ -3175,9 +3185,9 @@
             const rangerIndex = currentClasses.findIndex(c => c === 'ranger');
             const rangerLevel = currentLevels[rangerIndex] || 1;
             
-            // Calculate tracking ability (base 12% per level, PHB p32)
-            const trackingScore = Math.min(rangerLevel * 12, 99);
-            document.getElementById('rangerTrackingScore').textContent = trackingScore;
+            // Tracking is a WIS-based nonweapon proficiency (PHB p.32); display as ability check
+            const trackingWIS = parseInt(abilityInputs.wis.value) || 10;
+            document.getElementById('rangerTrackingScore').textContent = `${trackingWIS} (WIS check)`;
             
             // Calculate stealth abilities (like a thief of same level, PHB p32)
             // Hide in Shadows: base 10 + 5/level
@@ -4157,24 +4167,26 @@
         };
 
         // Opposition schools for specialists
+        // Spells may be tagged 'Invocation', 'Evocation', or 'Invocation/Evocation'; list both to
+        // ensure the includes()-based filter catches all three variants.
         const oppositionSchools = {
             illusionist: ['Necromancy', 'Invocation', 'Evocation'],
             // Mage has no opposition schools (generalist)
             mage: [],
             // Mage specialist schools (using mage-schoolname format) - PHB standard specialists
             'mage-abjurer': ['Alteration', 'Illusion'],
-            'mage-conjurer': ['Divination', 'Invocation'],
+            'mage-conjurer': ['Divination', 'Invocation', 'Evocation'],
             'mage-diviner': ['Conjuration'],
-            'mage-enchanter': ['Invocation', 'Necromancy'],
+            'mage-enchanter': ['Invocation', 'Evocation', 'Necromancy'],
             'mage-illusionist': ['Necromancy', 'Invocation', 'Evocation'],
             'mage-invoker': ['Enchantment', 'Conjuration'],
             'mage-necromancer': ['Enchantment', 'Illusion'],
             'mage-transmuter': ['Necromancy', 'Abjuration'],
             // Wu Jen specialist schools (using wujen-schoolname format)
             'wujen-abjurer': ['Alteration', 'Illusion'],
-            'wujen-conjurer': ['Divination', 'Invocation'],
+            'wujen-conjurer': ['Divination', 'Invocation', 'Evocation'],
             'wujen-diviner': ['Conjuration'],
-            'wujen-enchanter': ['Invocation', 'Necromancy'],
+            'wujen-enchanter': ['Invocation', 'Evocation', 'Necromancy'],
             'wujen-invoker': ['Enchantment', 'Conjuration'],
             'wujen-necromancer': ['Enchantment', 'Illusion'],
             'wujen-transmuter': ['Necromancy', 'Abjuration']
@@ -4279,9 +4291,9 @@
         // Cleric and Druid spell lists (keeping these simpler without school tags)
         const clericSpellList = {
             1: ['Cure Light Wounds', 'Bless', 'Command', 'Detect Evil', 'Protection from Evil', 'Remove Fear', 'Sanctuary', 'Create Water', 'Detect Magic', 'Light', 'Purify Food and Drink', 'Endure Heat/Cold', 'Combine'],
-            2: ['Cure Moderate Wounds', 'Hold Person', 'Silence 15\' Radius', 'Spiritual Hammer', 'Aid', 'Augury', 'Chant', 'Find Traps', 'Know Alignment', 'Resist Fire', 'Slow Poison', 'Speak with Animals', 'Withdraw', 'Wyvern Watch'],
+            2: ['Hold Person', 'Silence 15\' Radius', 'Spiritual Hammer', 'Aid', 'Augury', 'Chant', 'Find Traps', 'Know Alignment', 'Resist Fire', 'Slow Poison', 'Speak with Animals', 'Withdraw', 'Wyvern Watch'],
             3: ['Cure Serious Wounds', 'Dispel Magic', 'Prayer', 'Remove Curse', 'Animate Dead', 'Continual Light', 'Create Food and Water', 'Glyph of Warding', 'Locate Object', 'Speak with Dead', 'Meld into Stone', 'Negative Plane Protection'],
-            4: ['Cure Critical Wounds', 'Neutralize Poison', 'Protection from Evil 10\' Radius', 'Divination', 'Detect Lie', 'Lower Water', 'Speak with Plants', 'Sticks to Snakes', 'Tongues', 'Free Action', 'Imbue with Spell Ability'],
+            4: ['Neutralize Poison', 'Protection from Evil 10\' Radius', 'Divination', 'Detect Lie', 'Lower Water', 'Speak with Plants', 'Sticks to Snakes', 'Tongues', 'Free Action', 'Imbue with Spell Ability'],
             5: ['Cure Critical Wounds', 'Raise Dead', 'Flame Strike', 'Dispel Evil', 'Commune', 'Insect Plague', 'Plane Shift', 'Quest', 'True Seeing', 'Atonement', 'Moonbeam'],
             6: ['Heal', 'Harm', 'Blade Barrier', 'Find the Path', 'Speak with Monsters', 'Stone Tell', 'Word of Recall', 'Conjure Animals', 'Aerial Servant', 'Animate Object'],
             7: ['Resurrection', 'Regenerate', 'Holy Word', 'Restoration', 'Astral Spell', 'Control Weather', 'Earthquake', 'Gate', 'Symbol', 'Sunray', 'Exaction']
@@ -4289,8 +4301,8 @@
 
         const druidSpellList = {
             1: ['Cure Light Wounds', 'Detect Magic', 'Entangle', 'Faerie Fire', 'Invisibility to Animals', 'Pass Without Trace', 'Predict Weather', 'Shillelagh', 'Speak with Animals', 'Animal Friendship', 'Locate Animals or Plants'],
-            2: ['Cure Moderate Wounds', 'Barkskin', 'Charm Person or Mammal', 'Fire Trap', 'Heat Metal', 'Obscurement', 'Produce Flame', 'Warp Wood', 'Trip', 'Slow Poison'],
-            3: ['Cure Serious Wounds', 'Call Lightning', 'Hold Animal', 'Plant Growth', 'Protection from Fire', 'Pyrotechnics', 'Speak with Plants', 'Water Breathing', 'Snare', 'Spike Growth'],
+            2: ['Barkskin', 'Charm Person or Mammal', 'Fire Trap', 'Heat Metal', 'Obscurement', 'Produce Flame', 'Warp Wood', 'Trip', 'Slow Poison'],
+            3: ['Call Lightning', 'Hold Animal', 'Plant Growth', 'Protection from Fire', 'Pyrotechnics', 'Speak with Plants', 'Water Breathing', 'Snare', 'Spike Growth'],
             4: ['Cure Serious Wounds', 'Call Woodland Beings', 'Control Temperature 10\' Radius', 'Dispel Magic', 'Hallucinatory Forest', 'Plant Door', 'Produce Fire', 'Repel Insects', 'Animal Summoning I'],
             5: ['Cure Critical Wounds', 'Animal Growth', 'Anti-Plant Shell', 'Commune with Nature', 'Insect Plague', 'Pass Plant', 'Wall of Fire', 'Animal Summoning II', 'Moonbeam'],
             6: ['Cure Critical Wounds', 'Anti-Animal Shell', 'Conjure Fire Elemental', 'Fire Seeds', 'Transport via Plants', 'Turn Wood', 'Wall of Thorns', 'Animal Summoning III', 'Weather Summoning'],
@@ -4315,7 +4327,6 @@
             'Combine': { sphere: 'All', level: 1 },
             
             // CLERIC SPELLS - Level 2
-            'Cure Moderate Wounds': { sphere: 'Healing', level: 2 },
             'Hold Person': { sphere: 'Charm', level: 2 },
             'Silence 15\' Radius': { sphere: 'Guardian', level: 2 },
             'Spiritual Hammer': { sphere: 'Combat', level: 2 },
@@ -4344,8 +4355,7 @@
             'Meld into Stone': { sphere: 'Elemental', level: 3 },
             'Negative Plane Protection': { sphere: 'Protection', level: 3 },
             
-            // CLERIC SPELLS - Level 4
-            'Cure Critical Wounds': { sphere: 'Healing', level: 4 },
+            // CLERIC SPELLS - Level 4 (Cure Critical Wounds is level 5, mapped below)
             'Neutralize Poison': { sphere: 'Healing', level: 4 },
             'Protection from Evil 10\' Radius': { sphere: 'Protection', level: 4 },
             'Divination': { sphere: 'Divination', level: 4 },
@@ -4358,6 +4368,7 @@
             'Imbue with Spell Ability': { sphere: 'All', level: 4 },
             
             // CLERIC SPELLS - Level 5
+            'Cure Critical Wounds': { sphere: 'Healing', level: 5 },
             'Raise Dead': { sphere: 'Necromantic', level: 5 },
             'Flame Strike': { sphere: 'Combat', level: 5 },
             'Dispel Evil': { sphere: 'Protection', level: 5 },
@@ -5048,7 +5059,9 @@
             // Group spells by level, handling counts
             const spellsByLevel = {};
             Object.keys(characterSpells.memorizedSpells).forEach(key => {
-                const [level, spellName] = key.split('-');
+                const dashIdx = key.indexOf('-');
+                const level = key.slice(0, dashIdx);
+                const spellName = key.slice(dashIdx + 1);
                 const count = characterSpells.memorizedSpells[key];
                 
                 // Skip undefined or invalid spells
@@ -5062,7 +5075,6 @@
                 }
             });
             
-            html += '</div>';
             Object.keys(spellsByLevel).sort().forEach(level => {
                 html += `<div class="memorized-spell-level">`;
                 html += `<h3>Level ${level} Spells</h3>`;
@@ -5230,7 +5242,7 @@
                         const knownAtLevel = Object.keys(characterSpells.knownSpells).filter(key => 
                             key.startsWith(`${level}-`)
                         );
-                        availableSpells = knownAtLevel.map(key => key.split('-')[1]);
+                        availableSpells = knownAtLevel.map(key => key.slice(key.indexOf('-') + 1));
                     }
                     
                     if (availableSpells.length > 0) {
@@ -5271,7 +5283,7 @@
             const inputs = document.querySelectorAll('#memorizeSpellContainer input[type="number"]');
             
             // Determine bonus spells
-            const isPriest = caster.class === 'cleric' || caster.class === 'druid';
+            const isPriest = caster.class === 'cleric' || caster.class === 'druid' || caster.class === 'paladin' || caster.class === 'ranger';
             // Check if Wu Jen is a specialist (has chosen a school)
             const wujenSchool = document.getElementById('wuJenSchool')?.value || '';
             const isWuJenSpecialist = caster.class === 'wujen' && wujenSchool !== '';
@@ -5351,7 +5363,7 @@
                 return;
             }
             
-            const isPriest = caster.class === 'cleric' || caster.class === 'druid';
+            const isPriest = caster.class === 'cleric' || caster.class === 'druid' || caster.class === 'paladin' || caster.class === 'ranger';
             const title = document.getElementById('cantripModalTitle');
             const instructions = document.getElementById('cantripInstructions');
             
@@ -5478,16 +5490,8 @@
                 if (confirm(`Congratulations! You have enough XP to advance to level ${newLevel}. Level up now?`)) {
                     currentLevels[0] = newLevel;
                     level1Input.value = newLevel;
-                    
-                    // For multi-class, level them up too
-                    if (currentClasses[1]) {
-                        currentLevels[1] = newLevel;
-                        level2Input.value = newLevel;
-                    }
-                    if (currentClasses[2]) {
-                        currentLevels[2] = newLevel;
-                        level3Input.value = newLevel;
-                    }
+                    // Multi-class characters level each class independently based on separate XP pools;
+                    // only class 1 is tracked here. Adjust class 2/3 levels manually.
                     
                     updateCharacter();
                     updateXPDisplay();
@@ -5865,8 +5869,13 @@
             }
             
             // Load spells
-            characterSpells = char.spells || { knownSpells: {}, memorizedSpells: {}, castSpells: {} };
-            
+            characterSpells = char.spells || {};
+            if (!characterSpells.knownSpells) characterSpells.knownSpells = {};
+            if (!characterSpells.memorizedSpells) characterSpells.memorizedSpells = {};
+            if (!characterSpells.castSpells) characterSpells.castSpells = {};
+            if (!characterSpells.knownCantrips) characterSpells.knownCantrips = [];
+            if (!characterSpells.memorizedCantrips) characterSpells.memorizedCantrips = [];
+
             updateCharacter();
             updateDeityAbilities();
             updateXPDisplay();
@@ -6125,8 +6134,13 @@
                         }
                     }
                     
-                    characterSpells = char.spells || { knownSpells: {}, memorizedSpells: {}, castSpells: {} };
-                    
+                    characterSpells = char.spells || {};
+                    if (!characterSpells.knownSpells) characterSpells.knownSpells = {};
+                    if (!characterSpells.memorizedSpells) characterSpells.memorizedSpells = {};
+                    if (!characterSpells.castSpells) characterSpells.castSpells = {};
+                    if (!characterSpells.knownCantrips) characterSpells.knownCantrips = [];
+                    if (!characterSpells.memorizedCantrips) characterSpells.memorizedCantrips = [];
+
                     updateCharacter();
                     updateDeityAbilities();
                     updateXPDisplay();
@@ -6151,7 +6165,8 @@
             const spellbookModal = document.getElementById('spellbookModal');
             const memorizeModal = document.getElementById('memorizeModal');
             const thiefSkillModal = document.getElementById('thiefSkillModal');
-            
+            const cantripModal = document.getElementById('cantripModal');
+
             if (spellbookModal) {
                 spellbookModal.addEventListener('click', function(e) {
                     if (e.target === this) {
@@ -6167,11 +6182,19 @@
                     }
                 });
             }
-            
+
             if (thiefSkillModal) {
                 thiefSkillModal.addEventListener('click', function(e) {
                     if (e.target === this) {
                         closeThiefSkillModal();
+                    }
+                });
+            }
+
+            if (cantripModal) {
+                cantripModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeCantripModal();
                     }
                 });
             }
@@ -6181,6 +6204,7 @@
                     closeSpellbookModal();
                     closeMemorizeModal();
                     closeThiefSkillModal();
+                    closeCantripModal();
                 }
             });
 
