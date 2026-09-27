@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>AD&D 2nd Edition Character Sheet</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
     <style>
@@ -694,6 +696,9 @@
         <!-- Class Section -->
         <div class="section">
             <h2>Class & Level</h2>
+            <p style="font-size: 0.9rem; font-style: italic; margin-bottom: 1rem; color: var(--accent);">
+                <strong>Note:</strong> Select your race above first, then class options will appear below.
+            </p>
             <div id="classContainer" class="multi-class-container">
                 <div class="class-selection">
                     <div class="form-group">
@@ -821,7 +826,14 @@
                         <span class="stat-label">Initiative:</span>
                         <span class="stat-value" id="initiative" style="font-size: 1.8rem;">+0</span>
                     </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Movement Rate:</span>
+                        <span class="stat-value" id="movementRate" style="font-size: 1.8rem;">12"</span>
+                    </div>
                 </div>
+                <p style="font-size: 0.85rem; font-style: italic; margin-top: 0.5rem;">
+                    Movement in inches (1" = 10 yards outdoors, 10 feet indoors). Base movement by race, enhanced for Monks by level.
+                </p>
             </div>
             
             <!-- THAC0 To-Hit Chart -->
@@ -1526,6 +1538,80 @@
                 </ul>
             </div>
         </div>
+
+        <!-- Monk Specific Section -->
+        <div class="section hidden" id="monkSection">
+            <h2>Monk Abilities</h2>
+            
+            <div style="background: var(--aged-paper); padding: 1rem; border: 2px solid var(--accent); margin-bottom: 1rem;">
+                <h3 style="font-family: 'Cinzel', serif; color: var(--accent); margin-bottom: 0.5rem;">Unarmored Combat</h3>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">Monk AC (no armor):</span>
+                        <span class="stat-value" style="color: var(--accent); font-weight: bold; font-size: 1.3rem;" id="monkAC">10</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Unarmed Damage:</span>
+                        <span class="stat-value" style="font-weight: bold; font-size: 1.2rem;" id="monkDamage">1d3</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Attacks per Round:</span>
+                        <span class="stat-value" style="font-weight: bold; font-size: 1.2rem;" id="monkAttacks">1/round</span>
+                    </div>
+                </div>
+                <p style="font-size: 0.85rem; font-style: italic; margin-top: 0.5rem; margin-bottom: 0;">
+                    AC improves with level and DEX. No armor or shields allowed (bracers permitted).
+                </p>
+            </div>
+            
+            <div style="background: var(--aged-paper); padding: 1rem; border: 1px solid var(--border); margin-bottom: 1rem;">
+                <h3 style="font-family: 'Cinzel', serif; color: var(--accent); margin-bottom: 0.5rem;">Movement & Special Abilities</h3>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">Movement Rate:</span>
+                        <span class="stat-value" id="monkMovement">12"</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Stunning Attack:</span>
+                        <span class="stat-value" id="monkStunning">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Thief Skills:</span>
+                        <span class="stat-value" id="monkThiefSkills">-</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="background: var(--aged-paper); padding: 1rem; border: 1px solid var(--border); margin-bottom: 1rem;">
+                <h3 style="font-family: 'Cinzel', serif; color: var(--accent); margin-bottom: 0.5rem;">Special Resistances</h3>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">Magic Resistance:</span>
+                        <span class="stat-value" id="monkMagicResist">0%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Slow Fall:</span>
+                        <span class="stat-value" id="monkSlowFall">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Immune to:</span>
+                        <span class="stat-value" id="monkImmunities">-</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="background: var(--aged-paper); padding: 1rem; border: 1px solid var(--border);">
+                <h3 style="font-family: 'Cinzel', serif; color: var(--accent); margin-bottom: 0.5rem;">Other Monk Abilities</h3>
+                <ul style="margin: 0; padding-left: 1.5rem;">
+                    <li><strong>Quivering Palm:</strong> Death touch ability at 13th level (once per week)</li>
+                    <li><strong>Speak with Animals:</strong> At will at 10th level</li>
+                    <li><strong>Mind Blank:</strong> Immune to ESP, detect lie, etc. at 9th level</li>
+                    <li><strong>Wholeness of Body:</strong> Heal self (2 HP per level, once per day) at 7th level</li>
+                    <li><strong>Code of Conduct:</strong> Must be Lawful alignment, cannot own more than can carry</li>
+                </ul>
+            </div>
+        </div>
+
         <!-- Character Management -->
         <div class="section">
             <h2>Character Management</h2>
@@ -1591,7 +1677,7 @@
                 name: 'Human',
                 adjustments: {},
                 allowedClasses: {
-                    single: ['fighter', 'paladin', 'ranger', 'cleric', 'druid', 'mage', 'illusionist', 'wujen', 'thief', 'bard'],
+                    single: ['fighter', 'paladin', 'ranger', 'cleric', 'druid', 'mage', 'illusionist', 'wujen', 'monk', 'thief', 'bard'],
                     multi: []
                 }
             },
@@ -1673,6 +1759,7 @@
             mage: { name: 'Mage', hitDie: 4, group: 'wizard' },
             illusionist: { name: 'Illusionist', hitDie: 4, group: 'wizard' },
             wujen: { name: 'Wu Jen', hitDie: 4, group: 'wizard' },
+            monk: { name: 'Monk', hitDie: 4, group: 'priest' },
             thief: { name: 'Thief', hitDie: 6, group: 'rogue' },
             bard: { name: 'Bard', hitDie: 6, group: 'rogue' }
         };
@@ -1935,6 +2022,20 @@
 
         const xpInput = document.getElementById('currentXP');
 
+        // iOS Safari fix: Force select elements to be interactive
+        function makeSelectTouchFriendly(selectElement) {
+            selectElement.style.webkitAppearance = 'menulist';
+            selectElement.style.appearance = 'menulist';
+            // Ensure select is tappable on iOS
+            selectElement.addEventListener('touchstart', function(e) {
+                // iOS sometimes needs this to properly trigger the native picker
+                this.focus();
+            }, { passive: true });
+        }
+
+        // Make all select elements touch-friendly for iOS
+        [raceSelect, class1Select, class2Select, class3Select].forEach(makeSelectTouchFriendly);
+
         // Initialize
         raceSelect.addEventListener('change', updateClassOptions);
         class1Select.addEventListener('change', () => updateMultiClassOptions(1));
@@ -1946,6 +2047,16 @@
 
         Object.values(abilityInputs).forEach(input => {
             input.addEventListener('input', updateCharacter);
+        });
+
+        // Initial setup on page load
+        window.addEventListener('load', function() {
+            // If there's already a race selected (from a loaded character), populate classes
+            if (raceSelect.value) {
+                updateClassOptions();
+            }
+            // Initial character update
+            updateCharacter();
         });
 
         function updateClassOptions() {
@@ -2047,6 +2158,8 @@
             updateRangerSection();
             updateFighterSection();
             updatePaladinSection();
+            updateMonkSection();
+            updateMovementRate();
             updateTurnUndead();
         }
 
@@ -3144,6 +3257,120 @@
             } else {
                 cureDisease.style.display = 'none';
             }
+        }
+        
+        function updateMonkSection() {
+            const hasMonk = currentClasses.some((c, i) => c === 'monk');
+            const monkSection = document.getElementById('monkSection');
+            
+            if (!hasMonk) {
+                monkSection.classList.add('hidden');
+                return;
+            }
+            
+            monkSection.classList.remove('hidden');
+            
+            // Find monk level
+            let monkLevel = 1;
+            currentClasses.forEach((c, i) => {
+                if (c === 'monk') {
+                    monkLevel = currentLevels[i];
+                }
+            });
+            
+            // Monk AC calculation (PHB Table 49)
+            // Base 10, improves by level, modified by DEX
+            const monkACByLevel = {
+                1: 10, 2: 9, 3: 8, 4: 7, 5: 7, 6: 6, 7: 5, 8: 4, 9: 3, 10: 2,
+                11: 1, 12: 0, 13: -1, 14: -2, 15: -3, 16: -4, 17: -5, 18: -6, 19: -7, 20: -8
+            };
+            
+            const dexScore = parseInt(abilityInputs.dex.value) || 10;
+            const dexACBonus = dexModifiers[dexScore]?.ac || 0;
+            const monkAC = monkACByLevel[monkLevel] + dexACBonus;
+            document.getElementById('monkAC').textContent = monkAC;
+            
+            // Monk unarmed damage (PHB Table 50)
+            const monkDamageByLevel = {
+                1: '1d3', 2: '1d4', 3: '1d4', 4: '1d6', 5: '1d6', 6: '1d6', 7: '1d8', 8: '1d8',
+                9: '1d8', 10: '1d10', 11: '1d10', 12: '1d10', 13: '1d12', 14: '1d12', 15: '1d12',
+                16: '2d6', 17: '2d6', 18: '2d6', 19: '2d8', 20: '2d8'
+            };
+            document.getElementById('monkDamage').textContent = monkDamageByLevel[monkLevel];
+            
+            // Attacks per round
+            let monkAttacks = '1/round';
+            if (monkLevel >= 4 && monkLevel <= 7) monkAttacks = '5/4 rounds';
+            else if (monkLevel >= 8 && monkLevel <= 11) monkAttacks = '3/2 rounds';
+            else if (monkLevel >= 12 && monkLevel <= 15) monkAttacks = '2/round';
+            else if (monkLevel >= 16) monkAttacks = '5/2 rounds';
+            document.getElementById('monkAttacks').textContent = monkAttacks;
+            
+            // Stunning attack
+            let stunning = '-';
+            if (monkLevel >= 1) stunning = `${monkLevel} uses/day`;
+            document.getElementById('monkStunning').textContent = stunning;
+            
+            // Thief skills (PHB: Monks get MS, HS, CW at specific percentages)
+            let thiefSkills = '-';
+            if (monkLevel >= 3) thiefSkills = 'Move Silently, Hide in Shadows, Climb Walls';
+            document.getElementById('monkThiefSkills').textContent = thiefSkills;
+            
+            // Magic Resistance (2% per level above 2nd)
+            let magicResist = 0;
+            if (monkLevel > 2) magicResist = (monkLevel - 2) * 2;
+            document.getElementById('monkMagicResist').textContent = `${magicResist}%`;
+            
+            // Slow Fall
+            let slowFall = '-';
+            if (monkLevel >= 4) slowFall = `${20 + ((monkLevel - 4) * 10)}'`;
+            document.getElementById('monkSlowFall').textContent = slowFall;
+            
+            // Immunities
+            let immunities = [];
+            if (monkLevel >= 3) immunities.push('Disease');
+            if (monkLevel >= 5) immunities.push('Haste/Slow');
+            if (monkLevel >= 11) immunities.push('Poison');
+            document.getElementById('monkImmunities').textContent = immunities.length > 0 ? immunities.join(', ') : '-';
+        }
+        
+        function updateMovementRate() {
+            // Base movement rates by race (in inches, 10 yards per inch)
+            const raceMovement = {
+                human: 12,
+                elf: 12,
+                'half-elf': 12,
+                dwarf: 6,
+                gnome: 6,
+                halfling: 6
+            };
+            
+            let baseMovement = raceMovement[currentRace] || 12;
+            
+            // Check if character is a monk - monks get enhanced movement
+            const hasMonk = currentClasses.some((c, i) => c === 'monk');
+            if (hasMonk) {
+                let monkLevel = 1;
+                currentClasses.forEach((c, i) => {
+                    if (c === 'monk') {
+                        monkLevel = currentLevels[i];
+                    }
+                });
+                
+                // Monk movement increases by level (PHB Table 49)
+                const monkMovementBonus = {
+                    1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 3, 7: 3, 8: 3,
+                    9: 6, 10: 6, 11: 6, 12: 9, 13: 9, 14: 9,
+                    15: 12, 16: 12, 17: 12, 18: 15, 19: 15, 20: 15
+                };
+                baseMovement += monkMovementBonus[monkLevel];
+                
+                // Update monk-specific movement display
+                document.getElementById('monkMovement').textContent = `${baseMovement}"`;
+            }
+            
+            // Display final movement rate
+            document.getElementById('movementRate').textContent = `${baseMovement}"`;
         }
         
         function updateTurnUndead() {
@@ -4821,7 +5048,9 @@
             // Group spells by level, handling counts
             const spellsByLevel = {};
             Object.keys(characterSpells.memorizedSpells).forEach(key => {
-                const [level, spellName] = key.split('-');
+                const dash = key.indexOf('-');
+                const level = key.slice(0, dash);
+                const spellName = key.slice(dash + 1);
                 const count = characterSpells.memorizedSpells[key];
                 
                 // Skip undefined or invalid spells
@@ -5003,7 +5232,7 @@
                         const knownAtLevel = Object.keys(characterSpells.knownSpells).filter(key => 
                             key.startsWith(`${level}-`)
                         );
-                        availableSpells = knownAtLevel.map(key => key.split('-')[1]);
+                        availableSpells = knownAtLevel.map(key => key.slice(key.indexOf('-') + 1));
                     }
                     
                     if (availableSpells.length > 0) {
@@ -5041,7 +5270,7 @@
         function saveMemorizedSpells() {
             const caster = getSpellcastingClass();
             const baseSlots = spellSlotsTable[caster.class][caster.level - 1];
-            const inputs = document.querySelectorAll('#memorizeSpellContainer input[type="number"]');
+            const inputs = document.querySelectorAll('#memorizeSpellContainer input[data-spell]');
             
             // Determine bonus spells
             const isPriest = caster.class === 'cleric' || caster.class === 'druid';
@@ -5356,11 +5585,9 @@
         }
 
         // Character Save/Load Functions
-        function saveCharacter() {
-            const charName = document.getElementById('charName').value || 'Unnamed Character';
-            
-            const charData = {
-                name: charName,
+        function buildCharacterData(name) {
+            return {
+                name: name,
                 playerName: document.getElementById('playerName').value,
                 race: currentRace,
                 alignment: document.getElementById('alignment').value,
@@ -5443,68 +5670,11 @@
                         dmgL: document.getElementById('weapon3DmgL')?.value || ''
                     }
                 ],
-                spells: characterSpells,
-                timestamp: Date.now()
+                spells: JSON.parse(JSON.stringify(characterSpells))
             };
-            
-            // Save to localStorage
-            let savedChars = JSON.parse(localStorage.getItem('dnd2eCharacters') || '[]');
-            const existingIndex = savedChars.findIndex(c => c.name === charName);
-            
-            if (existingIndex >= 0) {
-                if (confirm(`Character "${charName}" already exists. Overwrite?`)) {
-                    savedChars[existingIndex] = charData;
-                } else {
-                    return;
-                }
-            } else {
-                savedChars.push(charData);
-            }
-            
-            localStorage.setItem('dnd2eCharacters', JSON.stringify(savedChars));
-            alert(`Character "${charName}" saved!`);
-            displaySavedCharacters();
         }
 
-        function loadCharacter() {
-            displaySavedCharacters();
-        }
-
-        function displaySavedCharacters() {
-            const savedChars = JSON.parse(localStorage.getItem('dnd2eCharacters') || '[]');
-            const container = document.getElementById('savedCharactersList');
-            
-            if (savedChars.length === 0) {
-                container.innerHTML = '<p style="font-style: italic;">No saved characters.</p>';
-                return;
-            }
-            
-            let html = '<h3 style="font-family: \'Cinzel\', serif; margin-bottom: 0.5rem;">Saved Characters</h3>';
-            savedChars.forEach((char, index) => {
-                const classStr = char.classes.filter(c => c).map((c, i) => `${classData[c].name} ${char.levels[i]}`).join('/');
-                html += `
-                    <div class="saved-character-item">
-                        <div class="char-info">
-                            <div class="char-name">${char.name}</div>
-                            <div class="char-details">${raceData[char.race]?.name || 'Unknown'} ${classStr}</div>
-                        </div>
-                        <div class="char-actions">
-                            <button class="small-btn" onclick="loadCharacterData(${index})">Load</button>
-                            <button class="small-btn" onclick="deleteCharacter(${index})">Delete</button>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-        }
-
-        function loadCharacterData(index) {
-            const savedChars = JSON.parse(localStorage.getItem('dnd2eCharacters') || '[]');
-            const char = savedChars[index];
-            
-            if (!char) return;
-            
+        function applyCharacterData(char) {
             // Load basic info
             document.getElementById('charName').value = char.name;
             document.getElementById('playerName').value = char.playerName;
@@ -5523,23 +5693,33 @@
             currentRace = char.race;
             updateClassOptions();
             
-            // Load classes and levels
-            currentClasses = char.classes;
-            currentLevels = char.levels;
-            class1Select.value = char.classes[0] || '';
-            level1Input.value = char.levels[0];
+            // Load classes and levels. Copy the arrays: updateMultiClassOptions()
+            // writes into currentClasses, which must not clobber the saved data.
+            const classes = [...(char.classes || ['', '', ''])];
+            const levels = [...(char.levels || [1, 1, 1])];
+            class1Select.value = classes[0] || '';
+            level1Input.value = levels[0] || 1;
             
-            if (char.classes[1]) {
+            if (classes[0]) {
                 updateMultiClassOptions(1);
-                class2Select.value = char.classes[1];
-                level2Input.value = char.levels[1];
                 
-                if (char.classes[2]) {
+                if (classes[1]) {
+                    class2Select.value = classes[1];
+                    level2Input.value = levels[1] || 1;
                     updateMultiClassOptions(2);
-                    class3Select.value = char.classes[2];
-                    level3Input.value = char.levels[2];
+                    
+                    if (classes[2]) {
+                        class3Select.value = classes[2];
+                        level3Input.value = levels[2] || 1;
+                    }
                 }
             }
+            currentClasses = [class1Select.value, class2Select.value, class3Select.value];
+            currentLevels = [
+                parseInt(level1Input.value) || 1,
+                parseInt(level2Input.value) || 1,
+                parseInt(level3Input.value) || 1
+            ];
             
             // Load abilities
             abilityInputs.str.value = char.abilities.str;
@@ -5637,12 +5817,86 @@
                 }
             }
             
-            // Load spells
-            characterSpells = char.spells || { knownSpells: {}, memorizedSpells: {}, castSpells: {} };
+            // Load spells (fill in any fields missing from older saves)
+            const spells = char.spells || {};
+            characterSpells = {
+                knownSpells: spells.knownSpells || {},
+                memorizedSpells: spells.memorizedSpells || {},
+                castSpells: spells.castSpells || {},
+                knownCantrips: spells.knownCantrips || [],
+                memorizedCantrips: spells.memorizedCantrips || []
+            };
+            delete characterSpells.memorizedSpells['undefined'];
             
             updateCharacter();
             updateDeityAbilities();
             updateXPDisplay();
+        }
+
+        function saveCharacter() {
+            const charName = document.getElementById('charName').value || 'Unnamed Character';
+            
+            const charData = { ...buildCharacterData(charName), timestamp: Date.now() };
+            
+            // Save to localStorage
+            let savedChars = JSON.parse(localStorage.getItem('dnd2eCharacters') || '[]');
+            const existingIndex = savedChars.findIndex(c => c.name === charName);
+            
+            if (existingIndex >= 0) {
+                if (confirm(`Character "${charName}" already exists. Overwrite?`)) {
+                    savedChars[existingIndex] = charData;
+                } else {
+                    return;
+                }
+            } else {
+                savedChars.push(charData);
+            }
+            
+            localStorage.setItem('dnd2eCharacters', JSON.stringify(savedChars));
+            alert(`Character "${charName}" saved!`);
+            displaySavedCharacters();
+        }
+
+        function loadCharacter() {
+            displaySavedCharacters();
+        }
+
+        function displaySavedCharacters() {
+            const savedChars = JSON.parse(localStorage.getItem('dnd2eCharacters') || '[]');
+            const container = document.getElementById('savedCharactersList');
+            
+            if (savedChars.length === 0) {
+                container.innerHTML = '<p style="font-style: italic;">No saved characters.</p>';
+                return;
+            }
+            
+            let html = '<h3 style="font-family: \'Cinzel\', serif; margin-bottom: 0.5rem;">Saved Characters</h3>';
+            savedChars.forEach((char, index) => {
+                const classStr = char.classes.filter(c => c).map((c, i) => `${classData[c].name} ${char.levels[i]}`).join('/');
+                html += `
+                    <div class="saved-character-item">
+                        <div class="char-info">
+                            <div class="char-name">${char.name}</div>
+                            <div class="char-details">${raceData[char.race]?.name || 'Unknown'} ${classStr}</div>
+                        </div>
+                        <div class="char-actions">
+                            <button class="small-btn" onclick="loadCharacterData(${index})">Load</button>
+                            <button class="small-btn" onclick="deleteCharacter(${index})">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function loadCharacterData(index) {
+            const savedChars = JSON.parse(localStorage.getItem('dnd2eCharacters') || '[]');
+            const char = savedChars[index];
+            
+            if (!char) return;
+            
+            applyCharacterData(char);
             alert(`Character "${char.name}" loaded!`);
         }
 
@@ -5659,92 +5913,7 @@
 
         function exportCharacter() {
             const charName = document.getElementById('charName').value || 'character';
-            const charData = {
-                name: charName,
-                playerName: document.getElementById('playerName').value,
-                race: currentRace,
-                alignment: document.getElementById('alignment').value,
-                deity: document.getElementById('deity')?.value || '',
-                divineSpheres: selectedSpheres,
-                classes: currentClasses,
-                levels: currentLevels,
-                abilities: {
-                    str: parseInt(abilityInputs.str.value),
-                    dex: parseInt(abilityInputs.dex.value),
-                    con: parseInt(abilityInputs.con.value),
-                    int: parseInt(abilityInputs.int.value),
-                    wis: parseInt(abilityInputs.wis.value),
-                    cha: parseInt(abilityInputs.cha.value),
-                    strPercentile: parseInt(abilityInputs.strPercentile.value) || 0
-                },
-                xp: currentXP,
-                hpByLevel: hpByLevel,
-                currentHP: currentHP,
-                thiefSkillAllocations: thiefSkillAllocations,
-                thiefArmorType: document.getElementById('thiefArmorType')?.value || 'none',
-                proficiencies: {
-                    weapon: weaponProficiencies,
-                    nonWeapon: nonWeaponProficiencies,
-                    languages: languageProficiencies
-                },
-                mage: {
-                    school: document.getElementById('mageSchool')?.value || ''
-                },
-                wujen: {
-                    school: document.getElementById('wuJenSchool')?.value || '',
-                    element: document.getElementById('wuJenElement')?.value || '',
-                    taboo: document.getElementById('wuJenTaboo')?.value || ''
-                },
-                ranger: {
-                    speciesEnemy: rangerData.speciesEnemy,
-                    customEnemy: rangerData.customEnemy
-                },
-                paladin: {
-                    layOnHandsUsed: paladinData.layOnHandsUsed
-                },
-                savingThrowMods: {
-                    paralysis: parseInt(document.getElementById('saveParalysisMod')?.value) || 0,
-                    rod: parseInt(document.getElementById('saveRodMod')?.value) || 0,
-                    petrification: parseInt(document.getElementById('savePetrificationMod')?.value) || 0,
-                    breath: parseInt(document.getElementById('saveBreathMod')?.value) || 0,
-                    spell: parseInt(document.getElementById('saveSpellMod')?.value) || 0,
-                    blessActive: document.getElementById('spellBless')?.checked || false,
-                    prayerActive: document.getElementById('spellPrayer')?.checked || false
-                },
-                equipment: {
-                    armorACValue: parseInt(document.getElementById('armorACValue')?.value) || 0,
-                    armor: document.getElementById('armorWorn').value,
-                    shield: document.getElementById('shieldUsed').value,
-                    gold: parseInt(document.getElementById('goldPieces').value) || 0,
-                    weapons: document.getElementById('weaponsList').value,
-                    general: document.getElementById('equipmentList').value,
-                    magic: document.getElementById('magicItemsList').value
-                },
-                weapons: [
-                    {
-                        name: document.getElementById('weapon1Name')?.value || '',
-                        type: document.getElementById('weapon1Type')?.value || 'melee',
-                        magic: parseInt(document.getElementById('weapon1Magic')?.value) || 0,
-                        dmgSM: document.getElementById('weapon1DmgSM')?.value || '',
-                        dmgL: document.getElementById('weapon1DmgL')?.value || ''
-                    },
-                    {
-                        name: document.getElementById('weapon2Name')?.value || '',
-                        type: document.getElementById('weapon2Type')?.value || 'melee',
-                        magic: parseInt(document.getElementById('weapon2Magic')?.value) || 0,
-                        dmgSM: document.getElementById('weapon2DmgSM')?.value || '',
-                        dmgL: document.getElementById('weapon2DmgL')?.value || ''
-                    },
-                    {
-                        name: document.getElementById('weapon3Name')?.value || '',
-                        type: document.getElementById('weapon3Type')?.value || 'melee',
-                        magic: parseInt(document.getElementById('weapon3Magic')?.value) || 0,
-                        dmgSM: document.getElementById('weapon3DmgSM')?.value || '',
-                        dmgL: document.getElementById('weapon3DmgL')?.value || ''
-                    }
-                ],
-                spells: characterSpells
-            };
+            const charData = buildCharacterData(charName);
             
             const dataStr = JSON.stringify(charData, null, 2);
             const blob = new Blob([dataStr], { type: 'application/json' });
@@ -5769,140 +5938,7 @@
                 try {
                     const char = JSON.parse(e.target.result);
                     
-                    // Load the character data
-                    document.getElementById('charName').value = char.name;
-                    document.getElementById('playerName').value = char.playerName;
-                    document.getElementById('race').value = char.race;
-                    document.getElementById('alignment').value = char.alignment;
-                    document.getElementById('deity').value = char.deity || '';
-                    
-                    // Load divine spheres
-                    if (char.divineSpheres) {
-                        selectedSpheres = char.divineSpheres;
-                    } else {
-                        selectedSpheres = { major: [], minor: [] };
-                    }
-                    
-                    currentRace = char.race;
-                    updateClassOptions();
-                    
-                    currentClasses = char.classes;
-                    currentLevels = char.levels;
-                    class1Select.value = char.classes[0] || '';
-                    level1Input.value = char.levels[0];
-                    
-                    if (char.classes[1]) {
-                        updateMultiClassOptions(1);
-                        class2Select.value = char.classes[1];
-                        level2Input.value = char.levels[1];
-                        
-                        if (char.classes[2]) {
-                            updateMultiClassOptions(2);
-                            class3Select.value = char.classes[2];
-                            level3Input.value = char.levels[2];
-                        }
-                    }
-                    
-                    abilityInputs.str.value = char.abilities.str;
-                    abilityInputs.dex.value = char.abilities.dex;
-                    abilityInputs.con.value = char.abilities.con;
-                    abilityInputs.int.value = char.abilities.int;
-                    abilityInputs.wis.value = char.abilities.wis;
-                    abilityInputs.cha.value = char.abilities.cha;
-                    abilityInputs.strPercentile.value = char.abilities.strPercentile;
-                    
-                    // Load XP
-                    currentXP = char.xp || 0;
-                    xpInput.value = currentXP;
-                    
-                    // Load HP by level
-                    hpByLevel = char.hpByLevel || { class1: [], class2: [], class3: [] };
-                    
-                    // Load current HP
-                    currentHP = char.currentHP || 0;
-                    document.getElementById('currentHP').value = currentHP;
-                    
-                    // Load thief skill allocations
-                    thiefSkillAllocations = char.thiefSkillAllocations || {};
-                    
-                    // Load thief armor type
-                    if (char.thiefArmorType) {
-                        document.getElementById('thiefArmorType').value = char.thiefArmorType;
-                    }
-                    
-                    // Load proficiencies
-                    if (char.proficiencies) {
-                        weaponProficiencies = char.proficiencies.weapon || [];
-                        nonWeaponProficiencies = char.proficiencies.nonWeapon || [];
-                        languageProficiencies = char.proficiencies.languages || [];
-                    }
-                    
-                    // Load Mage data
-                    if (char.mage) {
-                        document.getElementById('mageSchool').value = char.mage.school || '';
-                    }
-                    
-                    // Load Wu Jen data
-                    if (char.wujen) {
-                        document.getElementById('wuJenSchool').value = char.wujen.school || '';
-                        document.getElementById('wuJenElement').value = char.wujen.element || '';
-                        document.getElementById('wuJenTaboo').value = char.wujen.taboo || '';
-                    }
-                    
-                    // Load Ranger data
-                    if (char.ranger) {
-                        rangerData.speciesEnemy = char.ranger.speciesEnemy || '';
-                        rangerData.customEnemy = char.ranger.customEnemy || '';
-                        document.getElementById('rangerSpeciesEnemy').value = rangerData.speciesEnemy;
-                        document.getElementById('rangerCustomEnemy').value = rangerData.customEnemy;
-                    }
-                    
-                    // Load Paladin data
-                    if (char.paladin) {
-                        paladinData.layOnHandsUsed = char.paladin.layOnHandsUsed || 0;
-                        document.getElementById('paladinLayOnHandsUsed').value = paladinData.layOnHandsUsed;
-                    }
-                    
-                    // Load saving throw modifiers
-                    if (char.savingThrowMods) {
-                        document.getElementById('saveParalysisMod').value = char.savingThrowMods.paralysis || 0;
-                        document.getElementById('saveRodMod').value = char.savingThrowMods.rod || 0;
-                        document.getElementById('savePetrificationMod').value = char.savingThrowMods.petrification || 0;
-                        document.getElementById('saveBreathMod').value = char.savingThrowMods.breath || 0;
-                        document.getElementById('saveSpellMod').value = char.savingThrowMods.spell || 0;
-                        document.getElementById('spellBless').checked = char.savingThrowMods.blessActive || false;
-                        document.getElementById('spellPrayer').checked = char.savingThrowMods.prayerActive || false;
-                    }
-                    
-                    // Load equipment
-                    if (char.equipment) {
-                        document.getElementById('armorACValue').value = char.equipment.armorACValue || 0;
-                        document.getElementById('armorWorn').value = char.equipment.armor || '';
-                        document.getElementById('shieldUsed').value = char.equipment.shield || '';
-                        document.getElementById('goldPieces').value = char.equipment.gold || 0;
-                        document.getElementById('weaponsList').value = char.equipment.weapons || '';
-                        document.getElementById('equipmentList').value = char.equipment.general || '';
-                        document.getElementById('magicItemsList').value = char.equipment.magic || '';
-                    }
-                    
-                    // Load weapons
-                    if (char.weapons) {
-                        for (let i = 0; i < 3; i++) {
-                            const weapon = char.weapons[i] || {};
-                            const num = i + 1;
-                            document.getElementById(`weapon${num}Name`).value = weapon.name || '';
-                            document.getElementById(`weapon${num}Type`).value = weapon.type || 'melee';
-                            document.getElementById(`weapon${num}Magic`).value = weapon.magic || 0;
-                            document.getElementById(`weapon${num}DmgSM`).value = weapon.dmgSM || '';
-                            document.getElementById(`weapon${num}DmgL`).value = weapon.dmgL || '';
-                        }
-                    }
-                    
-                    characterSpells = char.spells || { knownSpells: {}, memorizedSpells: {}, castSpells: {} };
-                    
-                    updateCharacter();
-                    updateDeityAbilities();
-                    updateXPDisplay();
+                    applyCharacterData(char);
                     alert(`Character "${char.name}" imported!`);
                 } catch (err) {
                     alert('Error importing character file: ' + err.message);
