@@ -1620,7 +1620,7 @@
                 <button onclick="loadCharacter()" class="action-btn">Load Character</button>
                 <button onclick="exportCharacter()" class="action-btn">Export to File</button>
                 <button onclick="importCharacter()" class="action-btn">Import from File</button>
-                <button onclick="window.print()" class="action-btn" style="background: var(--highlight); color: var(--ink);">🖨️ Print Character Sheet</button>
+                <button id="printBtn" onclick="window.print()" class="action-btn" style="background: var(--highlight); color: var(--ink);">🖨️ Print Character Sheet</button>
             </div>
             <div id="savedCharactersList"></div>
         </div>
@@ -1668,9 +1668,76 @@
         </div>
     </div>
 
+    <!-- In-page dialog (replaces browser alert/confirm/prompt, which some hosts block) -->
+    <div id="dialogModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="dialogMessage">
+        <div class="modal-content" style="max-width: 480px;">
+            <div class="modal-body">
+                <p id="dialogMessage" style="font-size: 1.05rem; margin-bottom: 1rem;"></p>
+                <input type="text" id="dialogInput" class="hidden" style="width: 100%; margin-bottom: 1rem;">
+                <div style="display: flex; gap: 0.75rem; justify-content: flex-end; flex-wrap: wrap;">
+                    <button id="dialogCancel" class="action-btn" style="background: var(--border);">Cancel</button>
+                    <button id="dialogOk" class="action-btn">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <input type="file" id="importFileInput" style="display: none;" accept=".json" onchange="handleFileImport(event)">
 
     <script>
+        // In-page dialogs. Browser alert/confirm/prompt are blocked when the sheet
+        // is hosted as a Claude artifact, so the sheet uses its own modal instead.
+        let dialogQueue = Promise.resolve();
+        function openDialog(message, { input = false, cancel = false } = {}) {
+            const run = () => new Promise(resolve => {
+                const modal = document.getElementById('dialogModal');
+                const msg = document.getElementById('dialogMessage');
+                const field = document.getElementById('dialogInput');
+                const ok = document.getElementById('dialogOk');
+                const no = document.getElementById('dialogCancel');
+                msg.textContent = message;
+                field.value = '';
+                field.classList.toggle('hidden', !input);
+                no.classList.toggle('hidden', !cancel);
+                modal.classList.remove('hidden');
+                (input ? field : ok).focus();
+                const finish = value => {
+                    modal.classList.add('hidden');
+                    ok.onclick = no.onclick = field.onkeydown = null;
+                    resolve(value);
+                };
+                ok.onclick = () => finish(input ? field.value : true);
+                no.onclick = () => finish(input ? null : false);
+                field.onkeydown = e => {
+                    if (e.key === 'Enter') ok.onclick();
+                    if (e.key === 'Escape') no.onclick();
+                };
+            });
+            dialogQueue = dialogQueue.then(run, run);
+            return dialogQueue;
+        }
+        function showNotice(message) { return openDialog(message); }
+        function askConfirm(message) { return openDialog(message, { cancel: true }); }
+        function askPrompt(message) { return openDialog(message, { input: true, cancel: true }); }
+
+        // Saved-character storage. Browser storage can be unavailable (private
+        // windows, blocked site data), so every access is guarded.
+        function readSavedChars() {
+            try {
+                return JSON.parse(localStorage.getItem('dnd2eCharacters') || '[]');
+            } catch (err) {
+                return [];
+            }
+        }
+        function writeSavedChars(savedChars) {
+            try {
+                localStorage.setItem('dnd2eCharacters', JSON.stringify(savedChars));
+                return true;
+            } catch (err) {
+                return false;
+            }
+        }
+
         // AD&D 2e Data Tables
         const raceData = {
             human: {
@@ -5091,7 +5158,7 @@
         function showSpellbookManager() {
             const caster = getSpellcastingClass();
             if (!caster) {
-                alert('You need to select a spellcasting class first (Mage, Cleric, Druid, or Illusionist).');
+                showNotice('You need to select a spellcasting class first (Mage, Cleric, Druid, or Illusionist).');
                 return;
             }
             
@@ -5147,7 +5214,7 @@
         function showMemorizeSpells() {
             const caster = getSpellcastingClass();
             if (!caster) {
-                alert('You need to select a spellcasting class first (Mage, Cleric, Druid, Illusionist, Paladin 9+, or Ranger 8+).');
+                showNotice('You need to select a spellcasting class first (Mage, Cleric, Druid, Illusionist, Paladin 9+, or Ranger 8+).');
                 return;
             }
             
@@ -5308,7 +5375,7 @@
                 const bonusSlots = bonusSpellsPerLevel[levelNum - 1] || 0;
                 const maxSlots = baseSlots[levelNum - 1] + bonusSlots;
                 if (selections[level] > maxSlots) {
-                    alert(`You can only memorize ${maxSlots} level ${level} spells!`);
+                    showNotice(`You can only memorize ${maxSlots} level ${level} spells!`);
                     valid = false;
                 }
             });
@@ -5349,7 +5416,7 @@
         function showCantripManager() {
             const caster = getSpellcastingClass();
             if (!caster) {
-                alert('You need to select a spellcasting class first.');
+                showNotice('You need to select a spellcasting class first.');
                 return;
             }
             
@@ -5403,15 +5470,15 @@
             const checkboxes = document.querySelectorAll('#cantripContainer input[type="checkbox"]:checked');
             characterSpells.knownCantrips = Array.from(checkboxes).map(cb => cb.value);
             closeCantripModal();
-            alert('Cantrips/Orisons updated!');
+            showNotice('Cantrips/Orisons updated!');
         }
         
         function closeCantripModal() {
             document.getElementById('cantripModal').classList.add('hidden');
         }
 
-        function resetDailySpells() {
-            if (confirm('Rest and regain all spell slots?')) {
+        async function resetDailySpells() {
+            if (await askConfirm('Rest and regain all spell slots?')) {
                 characterSpells.castSpells = {};
                 displayMemorizedSpells();
                 updateSpellcasting();
@@ -5444,13 +5511,13 @@
             }
         }
 
-        function addXP() {
-            const amount = prompt('How much XP to add?');
+        async function addXP() {
+            const amount = await askPrompt('How much XP to add?');
             if (amount === null) return;
             
             const xpAmount = parseInt(amount);
             if (isNaN(xpAmount) || xpAmount < 0) {
-                alert('Please enter a valid XP amount.');
+                showNotice('Please enter a valid XP amount.');
                 return;
             }
             
@@ -5462,13 +5529,13 @@
             checkLevelUp();
         }
 
-        function checkLevelUp() {
+        async function checkLevelUp() {
             const primaryClass = currentClasses[0];
             if (!primaryClass) return;
             
             const currentLevel = currentLevels[0];
             if (currentLevel >= 20) {
-                alert('You are already at maximum level!');
+                showNotice('You are already at maximum level!');
                 return;
             }
             
@@ -5477,7 +5544,7 @@
             if (currentXP >= xpNeeded) {
                 const newLevel = currentLevel + 1;
                 
-                if (confirm(`Congratulations! You have enough XP to advance to level ${newLevel}. Level up now?`)) {
+                if (await askConfirm(`Congratulations! You have enough XP to advance to level ${newLevel}. Level up now?`)) {
                     currentLevels[0] = newLevel;
                     level1Input.value = newLevel;
                     
@@ -5494,11 +5561,11 @@
                     updateCharacter();
                     updateXPDisplay();
                     
-                    alert(`Level up complete! You are now level ${newLevel}.`);
+                    showNotice(`Level up complete! You are now level ${newLevel}.`);
                 }
             } else {
                 const remaining = xpNeeded - currentXP;
-                alert(`You need ${remaining.toLocaleString()} more XP to reach level ${currentLevel + 1}.`);
+                showNotice(`You need ${remaining.toLocaleString()} more XP to reach level ${currentLevel + 1}.`);
             }
         }
         
@@ -5833,17 +5900,17 @@
             updateXPDisplay();
         }
 
-        function saveCharacter() {
+        async function saveCharacter() {
             const charName = document.getElementById('charName').value || 'Unnamed Character';
             
             const charData = { ...buildCharacterData(charName), timestamp: Date.now() };
             
-            // Save to localStorage
-            let savedChars = JSON.parse(localStorage.getItem('dnd2eCharacters') || '[]');
+            // Save to browser storage
+            let savedChars = readSavedChars();
             const existingIndex = savedChars.findIndex(c => c.name === charName);
             
             if (existingIndex >= 0) {
-                if (confirm(`Character "${charName}" already exists. Overwrite?`)) {
+                if (await askConfirm(`Character "${charName}" already exists. Overwrite?`)) {
                     savedChars[existingIndex] = charData;
                 } else {
                     return;
@@ -5852,8 +5919,11 @@
                 savedChars.push(charData);
             }
             
-            localStorage.setItem('dnd2eCharacters', JSON.stringify(savedChars));
-            alert(`Character "${charName}" saved!`);
+            if (!writeSavedChars(savedChars)) {
+                showNotice('This browser is not letting the sheet save characters. Use Export to File instead.');
+                return;
+            }
+            showNotice(`Character "${charName}" saved!`);
             displaySavedCharacters();
         }
 
@@ -5862,7 +5932,7 @@
         }
 
         function displaySavedCharacters() {
-            const savedChars = JSON.parse(localStorage.getItem('dnd2eCharacters') || '[]');
+            const savedChars = readSavedChars();
             const container = document.getElementById('savedCharactersList');
             
             if (savedChars.length === 0) {
@@ -5891,36 +5961,53 @@
         }
 
         function loadCharacterData(index) {
-            const savedChars = JSON.parse(localStorage.getItem('dnd2eCharacters') || '[]');
+            const savedChars = readSavedChars();
             const char = savedChars[index];
             
             if (!char) return;
             
             applyCharacterData(char);
-            alert(`Character "${char.name}" loaded!`);
+            showNotice(`Character "${char.name}" loaded!`);
         }
 
-        function deleteCharacter(index) {
-            const savedChars = JSON.parse(localStorage.getItem('dnd2eCharacters') || '[]');
+        async function deleteCharacter(index) {
+            const savedChars = readSavedChars();
             const charName = savedChars[index].name;
             
-            if (confirm(`Delete character "${charName}"?`)) {
+            if (await askConfirm(`Delete character "${charName}"?`)) {
                 savedChars.splice(index, 1);
-                localStorage.setItem('dnd2eCharacters', JSON.stringify(savedChars));
+                writeSavedChars(savedChars);
                 displaySavedCharacters();
             }
         }
 
-        function exportCharacter() {
+        async function exportCharacter() {
             const charName = document.getElementById('charName').value || 'character';
             const charData = buildCharacterData(charName);
             
             const dataStr = JSON.stringify(charData, null, 2);
+            const filename = `${charName.replace(/\s+/g, '_')}.json`;
+            
+            // Hosted as a Claude artifact: plain downloads are blocked, so ask the host to save it
+            if (window.claude?.use) {
+                const downloads = await window.claude.use('downloads');
+                if (downloads) {
+                    try {
+                        await downloads.save({ filename, data: dataStr });
+                    } catch (err) {
+                        if (err?.code !== 'declined') {
+                            showNotice('The file could not be saved here: ' + (err?.message || 'unknown error'));
+                        }
+                    }
+                    return;
+                }
+            }
+            
             const blob = new Blob([dataStr], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${charName.replace(/\s+/g, '_')}.json`;
+            a.download = filename;
             a.click();
             URL.revokeObjectURL(url);
         }
@@ -5939,9 +6026,9 @@
                     const char = JSON.parse(e.target.result);
                     
                     applyCharacterData(char);
-                    alert(`Character "${char.name}" imported!`);
+                    showNotice(`Character "${char.name}" imported!`);
                 } catch (err) {
-                    alert('Error importing character file: ' + err.message);
+                    showNotice('Error importing character file: ' + err.message);
                 }
             };
             reader.readAsText(file);
@@ -5993,6 +6080,11 @@
                 }
             });
 
+            // Printing is unavailable when hosted as a Claude artifact
+            if (window.claude) {
+                document.getElementById('printBtn').classList.add('hidden');
+            }
+            
             // Initialize saved characters list and XP display on load
             displaySavedCharacters();
             // Only update XP display if there's actually a class selected
